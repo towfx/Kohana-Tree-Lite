@@ -1,6 +1,6 @@
 <?php
 /**
- * The recursive call has been used only as the "tree walker" and not stacking any output.
+ *
  */
 class Kohana_Tree
 {
@@ -22,15 +22,17 @@ class Kohana_Tree
 
     protected $callbacks = array();
 
-    // protected static $instances;
+    protected static $instances;
 
     /**
-     echo tree::factory(DATA ROWS, 3 LEVEL)->li(6, 'selected-item')->ul(#ID, 'class');
+     * Initialize a tree
      *
-     echo tree::factory(DATA ROWS, 3 LEVEL)->ul('tree')->li(3, 'sub')->render();
-     echo tree::instance(DEFAULT)->bread_crumb(3);
+     * @param array $rows Array of objects
+     * @param boolean $reindex_all If the array did not conforms with the qualified $rows data structure.
+     * @param int $level
+     * @return Tree
      */
-    public static function factory($rows, $level=null, $reindex_all=false)
+    public static function factory($rows, $reindex_all=false, $level=null)
     {
         $tree = new Tree;
         $tree->rows = $rows;
@@ -40,6 +42,21 @@ class Kohana_Tree
         return $tree;
     }
 
+    public function save_instance($name='default'){
+        self::$instance[$name] = $this;
+    }
+
+    public function instance($name){
+        if(isset(self::$instance[$name]))
+        {
+            return self::$instance[$name];
+        }
+        else
+        {
+            throw new Exception;
+        }
+    }
+    
     /**
      * Produce tree meta data. Only one loop pass of the raw data.
      * @param bool $reindex_all
@@ -58,7 +75,8 @@ class Kohana_Tree
             }
         }
 
-        if ($reindex_all) $this->rows = $temp; unset($temp);
+        if ($reindex_all) $this->rows = $temp;
+        unset($temp);
 
         return $this;
     }
@@ -104,14 +122,14 @@ class Kohana_Tree
 
         foreach ($members as $member)
         {
-            $this->output .= $this->NEW_LINE.$this->padd(2+$lvl, $this->TAB).
+            $this->output .= $this->NEW_LINE
+                    .$this->padd(2+$lvl, $this->TAB).
                     '<li'.$id.$class.'>';
 
             $this->output .= $this->rows[$member]->name;
 
             if ( isset ($this->family[$member]))
             {
-                // recurse
                 ++$lvl;
                 $this->output .= $this->padd($lvl, $this->TAB);
                 $this->output .= $this->_list($this->family[$member], $type, $lvl,'level-'.$lvl);
