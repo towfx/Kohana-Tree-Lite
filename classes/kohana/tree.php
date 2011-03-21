@@ -42,11 +42,13 @@ class Kohana_Tree
         return $tree;
     }
 
-    public function save_instance($name='default'){
+    public function save_instance($name='default')
+    {
         self::$instance[$name] = $this;
     }
 
-    public function instance($name){
+    public function instance($name)
+    {
         if(isset(self::$instance[$name]))
         {
             return self::$instance[$name];
@@ -56,7 +58,7 @@ class Kohana_Tree
             throw new Exception;
         }
     }
-    
+
     /**
      * Produce tree meta data. Only one loop pass of the raw data.
      * @param bool $reindex_all
@@ -75,10 +77,17 @@ class Kohana_Tree
             }
         }
 
-        if ($reindex_all) $this->rows = $temp;
-        unset($temp);
+        if ($reindex_all)
+        {
+            $this->rows = $temp;
+            unset($temp);
+        }
 
         return $this;
+    }
+
+    protected function override($key, $value){
+        $this->{$key} = $value;
     }
     /**
      * Scopes are: item, rel, class
